@@ -9,7 +9,6 @@ const body_is_invalid = (items) => {
       return true;
     }
   }
-
   return false;
 }
 
