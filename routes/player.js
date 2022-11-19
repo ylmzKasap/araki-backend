@@ -108,6 +108,12 @@ router.put('/guess', async (req, res) => {
   }
 
   try {
+    // Update player name if needed
+    if (player.name !== alias) {
+      player.name = alias;
+      await player.save();
+    }
+    
     // Add the room if it does not exist
     const room = await Player.findOne({
       private_id: private_id,
