@@ -113,7 +113,7 @@ router.put('/guess', async (req, res) => {
       player.name = alias;
       await player.save();
     }
-    
+
     // Add the room if it does not exist
     const room = await Player.findOne({
       private_id: private_id,
@@ -140,7 +140,7 @@ router.put('/guess', async (req, res) => {
     }
 
     // Push the answer into the room array
-    const player = await Player.updateOne(
+    const playerResult = await Player.updateOne(
       {private_id: private_id, room: {"$elemMatch": {id: room_id}}},
       {"$push": {"room.$.guesses": {
         attempt: attempt,
@@ -150,7 +150,7 @@ router.put('/guess', async (req, res) => {
       }},
       last_guess_date: currentDate,
     });
-    return res.status(200).json(player);
+    return res.status(200).json(playerResult);
   } catch (err) {
     return res.status(400).json({error: err.message});
   }
