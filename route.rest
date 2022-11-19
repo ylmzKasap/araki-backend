@@ -1,0 +1,42 @@
+// Get room info
+GET http://localhost:3001/player/room/4
+
+###
+
+// Get player info
+GET http://localhost:3001/player/6378cefbcf92571b4d816811/b00033046bbec26f8d15898f46180227600dfb85990fee521546460b2eae82545da2064314ea89a0b2e56c75596e8575924c473818fab89fa8cdb65ce4654ea5
+
+###
+
+// Change player name
+PUT http://localhost:3001/player/name
+Content-Type: application/json
+
+{
+  "private_id": "cc20291d4c0760130073b9f43fc2aadc8d0d5d02f05aa39a8130fb6e346a1bb86cdc606311dd394b8676367887579d263eea36cd6a31bad0c506d5b3a6b34073",
+  "name": "Kamil"
+}
+
+###
+
+// Add a new player
+POST http://localhost:3001/player
+Content-Type: application/json
+
+{
+  "name": "Hüsnü"
+}
+
+###
+
+// Player finished the game
+PUT http://localhost:3001/player/guess
+Content-Type: application/json
+
+{
+  "private_id": "cc20291d4c0760130073b9f43fc2aadc8d0d5d02f05aa39a8130fb6e346a1bb86cdc606311dd394b8676367887579d263eea36cd6a31bad0c506d5b3a6b34073",
+  "room_id": "5",
+  "attempt": "1",
+  "found": false,
+  "alias": "xd"
+}
