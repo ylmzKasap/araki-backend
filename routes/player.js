@@ -49,16 +49,9 @@ router.get('/:public_id/:private_id', async (req, res) => {
 
 // Create a new player
 router.post('/', async (req, res) => {
-  const { name } = req.body;
-
-  if (body_is_invalid([name])) {
-    return res.status(400).json({error: "Invalid name"});
-  }
-
   const private_id = crypto.randomBytes(64).toString('hex');
 
   const player = new Player({
-    name: name,
     private_id: private_id
   })
 
