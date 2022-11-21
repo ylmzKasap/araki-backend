@@ -2,15 +2,8 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const Player = require('../models/player');
+const isAdmin = require('../models/middleware/isAdmin');
 
-const body_is_invalid = (items) => {
-  for (let item of items) {
-    if (!['string', 'boolean'].includes(typeof item)) {
-      return true;
-    }
-  }
-  return false;
-}
 
 // Get room results
 router.get('/room/:room_id', async (req, res) => {
@@ -67,7 +60,7 @@ router.post('/', async (req, res) => {
 router.put('/name', async (req, res) => {
   const { private_id, name } = req.body;
 
-  if (body_is_invalid([private_id, name])) {
+  if ([private_id, name].some(x => typeof x !== 'string')) {
     return res.status(400).json({error: "Invalid arguments"});
   }
 
@@ -96,7 +89,8 @@ router.put('/name', async (req, res) => {
 router.put('/guess', async (req, res) => {
   const { private_id, alias, room_id, attempt, found } = req.body;
 
-  if (body_is_invalid([private_id, alias, room_id, attempt, found])) {
+  if ([private_id, alias, room_id, attempt].some(x => typeof x !== 'string')
+    || typeof found !== 'boolean') {
     return res.status(400).json({error: "Invalid arguments"});
   }
 
@@ -151,6 +145,52 @@ router.put('/guess', async (req, res) => {
       last_guess_date: currentDate,
     });
     return res.status(200).json(playerResult);
+  } catch (err) {
+    return res.status(400).json({error: err.message});
+  }
+})
+
+// Delete a game result
+router.put('/delete_game', isAdmin, async (req, res) => {
+  const { player_public_id, room_id, guess_id } = req.body;
+
+  if ([player_public_id, room_id, guess_id].some(x => typeof x !== 'string')) {
+    return res.status(400).json({error: "Invalid arguments"});
+  }
+
+  try {
+    const deleteGame = await Player.updateOne({
+      _id: player_public_id
+    }, {
+      $pull : {"room.$[room].guesses" : {"_id": guess_id}}
+    },
+      { arrayFilters: [{ "room.id": room_id}] }
+    )
+    return res.status(200).json(deleteGame);
+  } catch (err) {
+    return res.status(400).json({error: err.message});
+  }
+})
+
+// Add a cheat game
+router.put('/cheat', isAdmin, async (req, res) => {
+  const { cheater_public_id, room_id, game_date } = req.body;
+
+  if ([cheater_public_id, room_id, game_date].some(x => typeof x !== 'string')) {
+    return res.status(400).json({error: "Invalid arguments"});
+  }
+
+  try {
+    const cheatGame = await Player.updateOne({
+      _id: cheater_public_id
+    }, {
+      "$set": { "room.$[room].guesses.$[guesses].cheat": true}
+    },
+    { arrayFilters: [
+      { "room.id": room_id},
+      {"guesses.date": game_date}]
+    })
+    return res.status(200).json(cheatGame);
   } catch (err) {
     return res.status(400).json({error: err.message});
   }
