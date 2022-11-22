@@ -123,7 +123,7 @@ router.put('/guess', async (req, res) => {
 
     // Only allow one game per day
     let currentDate = Date.now();
-    currentDate = new Date(currentDate).toLocaleDateString();
+    currentDate = new Date(currentDate).toLocaleDateString('en-US');
     const previousAnswer = await Player.findOne({
       private_id: private_id,
       room: {"$elemMatch": {id: room_id, "guesses.date": currentDate}}
@@ -191,6 +191,30 @@ router.put('/cheat', isAdmin, async (req, res) => {
       {"guesses.date": game_date}]
     })
     return res.status(200).json(cheatGame);
+  } catch (err) {
+    return res.status(400).json({error: err.message});
+  }
+})
+
+// Add a cheat game
+router.put('/date', isAdmin, async (req, res) => {
+  const { player_public_id, room_id, guess_id, new_date } = req.body;
+
+  if ([player_public_id, room_id, guess_id, new_date].some(x => typeof x !== 'string')) {
+    return res.status(400).json({error: "Invalid arguments"});
+  }
+
+  try {
+    const dateToUpdate = await Player.updateOne({
+      _id: player_public_id
+    }, {
+      "$set": { "room.$[room].guesses.$[guesses].date": new_date}
+    },
+    { arrayFilters: [
+      { "room.id": room_id},
+      {"guesses._id": guess_id}]
+    })
+    return res.status(200).json(dateToUpdate);
   } catch (err) {
     return res.status(400).json({error: err.message});
   }
