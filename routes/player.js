@@ -228,6 +228,10 @@ router.put('/merge', async (req, res) => {
     return res.status(400).json({error: "Invalid arguments"});
   }
 
+  if (private_id_to_merge === private_id_to_be_merged) {
+    return res.status(400).json({error: "Dostum sen zaten bu kişisin?!"});
+  }
+
   try {
     const playerOne = await Player.findOne({private_id: private_id_to_merge});
     const playerTwo = await Player.findOne({private_id: private_id_to_be_merged});
