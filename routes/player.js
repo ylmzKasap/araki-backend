@@ -265,8 +265,7 @@ router.put('/merge', async (req, res) => {
     }
 
     await Player.deleteOne({private_id: private_id_to_be_merged});
-    return res.status(200).json({merged_id: private_id_to_merge})
-    
+    return res.status(200).json({private_id: playerOne.private_id, public_id: playerOne._id})    
   } catch (err) {
     return res.status(400).json({error: err.message});
   }
