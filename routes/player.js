@@ -87,9 +87,9 @@ router.put('/name', async (req, res) => {
 
 // Add game result
 router.put('/guess', async (req, res) => {
-  const { private_id, alias, room_id, attempt, found } = req.body;
+  const { private_id, alias, room_id, attempt, found, speed } = req.body;
 
-  if ([private_id, alias, room_id, attempt].some(x => typeof x !== 'string')
+  if ([private_id, alias, room_id, attempt, speed].some(x => typeof x !== 'string')
     || typeof found !== 'boolean') {
     return res.status(400).json({error: "Invalid arguments"});
   }
@@ -97,8 +97,13 @@ router.put('/guess', async (req, res) => {
   const player = await Player.findOne({
     private_id: private_id
   })
+
   if (!player) {
     return res.status(400).json({error: 'Player not found'});
+  }
+
+  if (attempt < 1 || attempt > 6) {
+    return res.status(400).json({error: "Invalid attempt"});
   }
 
   try {
@@ -140,7 +145,8 @@ router.put('/guess', async (req, res) => {
         attempt: attempt,
         found: found,
         date: currentDate,
-        alias: alias
+        alias: alias,
+        speed: speed
       }},
       last_guess_date: currentDate,
     });

@@ -16,6 +16,7 @@ const playerSchema =  new mongoose.Schema({
       found: Boolean,
       date: String,
       alias: String,
+      speed: Number,
       cheat: {
         type: Boolean,
         default: false
