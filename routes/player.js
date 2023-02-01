@@ -22,6 +22,14 @@ router.get('/room/:room_id', async (req, res) => {
   }
 })
 
+// Check if the player is admin
+router.get('/is_admin/:private_id', async (req, res) => {
+  const { private_id } = req.params;
+
+  const is_admin = private_id === process.env.ADMIN_ID;
+  return res.status(200).json({is_admin});
+})
+
 // Get a single player
 router.get('/:public_id/:private_id', async (req, res) => {
   const { public_id, private_id } = req.params;
