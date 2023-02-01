@@ -191,7 +191,7 @@ router.put('/cheat', isAdmin, async (req, res) => {
   const { cheater_public_id, room_id, game_date, is_cheat } = req.body;
 
   if ([cheater_public_id, room_id, game_date].some(x => typeof x !== 'string')
-    || typeof is_cheat !== boolean) {
+    || typeof is_cheat !== 'boolean') {
     return res.status(400).json({error: "Invalid arguments"});
   }
 
