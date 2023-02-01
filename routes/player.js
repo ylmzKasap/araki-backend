@@ -188,9 +188,10 @@ router.put('/delete_game', isAdmin, async (req, res) => {
 
 // Add a cheat game
 router.put('/cheat', isAdmin, async (req, res) => {
-  const { cheater_public_id, room_id, game_date } = req.body;
+  const { cheater_public_id, room_id, game_date, is_cheat } = req.body;
 
-  if ([cheater_public_id, room_id, game_date].some(x => typeof x !== 'string')) {
+  if ([cheater_public_id, room_id, game_date].some(x => typeof x !== 'string')
+    || typeof is_cheat !== boolean) {
     return res.status(400).json({error: "Invalid arguments"});
   }
 
@@ -198,7 +199,7 @@ router.put('/cheat', isAdmin, async (req, res) => {
     const cheatGame = await Player.updateOne({
       _id: cheater_public_id
     }, {
-      "$set": { "room.$[room].guesses.$[guesses].cheat": true}
+      "$set": { "room.$[room].guesses.$[guesses].cheat": is_cheat}
     },
     { arrayFilters: [
       { "room.id": room_id},
