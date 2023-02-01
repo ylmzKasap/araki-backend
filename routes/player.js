@@ -290,4 +290,59 @@ router.put('/merge', async (req, res) => {
   }
 });
 
+// Merge players (for admin)
+router.put('/admin_merge', isAdmin, async (req, res) => {
+  const  { public_id_to_merge, public_id_to_be_merged } = req.body;
+
+  if ([public_id_to_merge, public_id_to_be_merged].some(x => typeof x !== 'string')) {
+    return res.status(400).json({error: "Invalid arguments"});
+  }
+
+  if (public_id_to_merge === public_id_to_be_merged) {
+    return res.status(400).json({error: "Dostum bunlar zaten aynı kişi?!"});
+  }
+
+  try {
+    const playerOne = await Player.findOne({_id: public_id_to_merge});
+    const playerTwo = await Player.findOne({_id: public_id_to_be_merged});
+    
+    if (!playerOne || !playerTwo) {
+      return res.status(400).json({error: "Player does not exist"});
+    }
+
+    for (let room of playerTwo.room) {
+      const oldRoom = await Player.findOne(
+        { 
+          _id: public_id_to_merge,
+          room: {"$elemMatch": {id: room.id}}
+        }, {_id: 1, name: 1, room: {"$elemMatch": {id: room.id}}}
+      )
+      
+      if (!oldRoom) {
+        await Player.updateOne({_id: public_id_to_merge}, {"$push": {
+          room: [{
+            id: room.id
+          }]
+        }});
+      }
+
+      for (let guess of room.guesses) {
+        await Player.updateOne({
+          _id: public_id_to_merge,
+          room: {"$elemMatch": {id: room.id}}},
+          {"$push": {"room.$[room].guesses": guess}},
+          { arrayFilters: [
+            { "room.id": room.id},
+          ] }
+        )
+      }
+    }
+
+    await Player.deleteOne({_id: public_id_to_be_merged});
+    return res.status(200).json()    
+  } catch (err) {
+    return res.status(400).json({error: err.message});
+  }
+});
+
 module.exports = router;

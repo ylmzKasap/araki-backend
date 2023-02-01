@@ -1,4 +1,8 @@
 module.exports = (req, res, next) => {
+  if (!req.body.admin_id) {
+    return res.status(401).json();
+  }
+
   if (typeof req.body.admin_id !== 'string') {
     return res.status(400).json({error: "Invalid arguments"});
   }
