@@ -186,6 +186,26 @@ router.put('/delete_game', isAdmin, async (req, res) => {
   }
 })
 
+// Delete a room from a player
+router.put('/delete_room', isAdmin, async (req, res) => {
+  const { player_public_id, room_id } = req.body;
+
+  if ([player_public_id, room_id].some(x => typeof x !== 'string')) {
+    return res.status(400).json({error: "Invalid arguments"});
+  }
+
+  try {
+    const deleteRoom = await Player.updateOne({
+      _id: player_public_id
+    }, {
+      $pull : {"room" : {"id": room_id}}
+    })
+    return res.status(200).json(deleteRoom);
+  } catch (err) {
+    return res.status(400).json({error: err.message});
+  }
+})
+
 // Add a cheat game
 router.put('/cheat', isAdmin, async (req, res) => {
   const { cheater_public_id, room_id, game_date, is_cheat } = req.body;
