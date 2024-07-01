@@ -154,7 +154,8 @@ router.put('/guess', async (req, res) => {
         found: found,
         date: currentDate,
         alias: alias,
-        speed: speed
+        speed: speed,
+        cheat: attempt === "1"
       }},
       last_guess_date: currentDate,
     });
