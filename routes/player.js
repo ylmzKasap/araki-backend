@@ -16,6 +16,7 @@ router.get('/room/:room_id', async (req, res) => {
         name: 1,
         room: {"$elemMatch": {id: req.params.room_id} }
       });
+    console.dir(roomResults, { depth: null, colors: true })
     return res.json(roomResults)
   } catch (err) {
     return res.status(500).json({error: err.message});

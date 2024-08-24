@@ -8,7 +8,7 @@ const app = express();
 mongoose.connect(process.env.DATABASE_URL);
 const db = mongoose.connection;
 db.on('error', (error) => console.log(error));
-db.once('open', () => console.log('Connected to the database'));
+db.once('open', () => console.log('Connected to mongo'));
 
 /* const corsOptions = {
   origin: 'https://www.arakibulasın.com',
