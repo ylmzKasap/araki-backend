@@ -29,4 +29,4 @@ const playerSchema =  new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Player', playerSchema);
+module.exports = mongoose.model('playerse', playerSchema);

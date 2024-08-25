@@ -34,4 +34,4 @@ app.use((err, req, res, next) => {
   return res.status(404).send({ errDesc: 'Invalid request' });
 });
 
-app.listen(3002, () => console.log('Listening port 3002'));
+app.listen(3001, () => console.log('Listening port 3001'));
